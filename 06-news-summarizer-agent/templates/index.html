@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>News Summarizer Agent</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #07111f;
+        --panel: rgba(10, 22, 39, 0.85);
+        --panel-2: rgba(16, 33, 58, 0.95);
+        --text: #f4f7fb;
+        --muted: #9aa8c2;
+        --accent: #63b3ff;
+        --accent-2: #8b5cf6;
+        --border: rgba(255, 255, 255, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, "Segoe UI", Roboto, sans-serif;
+        background: radial-gradient(circle at top left, #12304f 0%, var(--bg) 45%, #030712 100%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 20px 56px;
+      }
+
+      .hero {
+        background: linear-gradient(135deg, rgba(99,179,255,0.16), rgba(139,92,246,0.16));
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      }
+
+      .hero h1 {
+        margin: 0 0 10px;
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+      }
+
+      .hero p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 720px;
+        line-height: 1.6;
+      }
+
+      form {
+        margin-top: 24px;
+        display: grid;
+        gap: 14px;
+        grid-template-columns: 2fr 1fr auto;
+        align-items: end;
+      }
+
+      label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+
+      input, button {
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 12px 14px;
+        font-size: 1rem;
+      }
+
+      input {
+        background: rgba(255,255,255,0.05);
+        color: var(--text);
+      }
+
+      button {
+        background: linear-gradient(90deg, var(--accent), var(--accent-2));
+        color: white;
+        cursor: pointer;
+        border: none;
+        font-weight: 600;
+        min-width: 140px;
+      }
+
+      .content {
+        display: grid;
+        gap: 20px;
+        margin-top: 24px;
+        grid-template-columns: 1.1fr 0.9fr;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 20px;
+        backdrop-filter: blur(14px);
+      }
+
+      .card h2 {
+        margin-top: 0;
+        margin-bottom: 12px;
+        font-size: 1.15rem;
+      }
+
+      .articles {
+        display: grid;
+        gap: 12px;
+      }
+
+      .article {
+        padding: 14px;
+        border-radius: 14px;
+        background: var(--panel-2);
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+
+      .article h3 { margin: 0 0 6px; font-size: 1rem; }
+      .article p { margin: 0; color: var(--muted); line-height: 1.5; }
+      .article a { color: var(--accent); text-decoration: none; }
+
+      .summary {
+        white-space: pre-wrap;
+        line-height: 1.7;
+        color: #e8eef9;
+      }
+
+      .error {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: rgba(255, 84, 84, 0.14);
+        color: #ffb4b4;
+        border: 1px solid rgba(255,84,84,0.26);
+      }
+
+      @media (max-width: 860px) {
+        form, .content { grid-template-columns: 1fr; }
+        button { width: 100%; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <section class="hero">
+        <h1>News Summarizer Agent</h1>
+        <p>Turn the latest headlines into a crisp briefing with a refined interface powered by Ollama.</p>
+
+        <form method="post">
+          <label>
+            Topic
+            <input name="topic" placeholder="Enter a topic" value="{{ topic }}" required />
+          </label>
+          <label>
+            Count
+            <input name="count" type="number" min="1" max="10" value="{{ count }}" />
+          </label>
+          <button type="submit">Generate Briefing</button>
+        </form>
+      </section>
+
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %}
+
+      <section class="content">
+        <div class="card">
+          <h2>Latest Articles</h2>
+          <div class="articles">
+            {% if articles %}
+              {% for article in articles %}
+              <div class="article">
+                <h3>{{ article.title }}</h3>
+                <p>{{ article.description }}</p>
+                <p><a href="{{ article.url }}" target="_blank" rel="noreferrer">Read more</a></p>
+              </div>
+              {% endfor %}
+            {% else %}
+              <p>No articles fetched yet. Submit a topic to begin.</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>AI Summary</h2>
+          <div class="summary">{{ summary or 'Your briefing will appear here.' }}</div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
